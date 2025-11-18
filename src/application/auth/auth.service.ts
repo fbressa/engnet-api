@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import {Repository} from "typeorm";
@@ -17,7 +17,7 @@ export class AuthServiceImplemantation  {
         const user = await this.userRepository.findOne({where : { email: login.email }});
 
         if (!user) {
-            throw new Error('O email ou senha estão incorretos');
+            throw new UnauthorizedException('O email ou senha estão incorretos');
         }
 
         const senhaInserida = login.password;
@@ -26,7 +26,7 @@ export class AuthServiceImplemantation  {
         const usuarioAutenticado = await bcrypt.compare(senhaInserida, senhaHash);
 
         if (!usuarioAutenticado) {
-          throw new Error('O email ou senha estão incorretos');
+          throw new UnauthorizedException('O email ou senha estão incorretos');
         }
 
         const payload = {
