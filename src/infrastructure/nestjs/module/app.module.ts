@@ -10,9 +10,14 @@ import { UserEntity } from '../../../entity/user/user.entity';
 import { ClientEntity } from '../../../entity/client/client.entity';
 import { RefundEntity } from '../../../entity/refund/refund.entity';
 
+import { RefundModule } from '../../../service/refund/refund.module';
+import { ClientModule } from '../../../service/client/client.module'; 
+
 @Module({
   imports: [
     AuthModule,
+    RefundModule,
+    ClientModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig],
