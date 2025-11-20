@@ -1,6 +1,6 @@
-
+/* eslint-disable */
 import * as process from 'node:process';
-import {registerAs} from "@nestjs/config";
+import { registerAs } from '@nestjs/config';
 
 export default registerAs('database', () => ({
   type: 'postgres',
@@ -8,5 +8,9 @@ export default registerAs('database', () => ({
   port: parseInt(process.env.DB_PORT ?? '5432', 10),
   username: process.env.DB_USERNAME ?? 'postgres',
   password: process.env.DB_PASSWORD ?? 'postgres',
-  database: process.env.DB_NAME ?? 'test_db',
+  database: process.env.DB_NAME ?? 'postgres', 
+  
+  // CRIAR AS TABELAS:
+  synchronize: true, 
+  autoLoadEntities: true, 
 }));
