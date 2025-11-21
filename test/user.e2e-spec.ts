@@ -148,11 +148,155 @@ describe('UserController (e2e)', () => {
         });
     });
 
-    it('deve retornar null para ID inválido', () => {
+    it('deve retornar 404 para ID inválido', () => {
       return request(app.getHttpServer())
         .get('/users/00000000-0000-0000-0000-000000000000')
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
+        .expect(404);
+    });
+  });
+
+  describe('PUT /users/:id - Atualizar usuário', () => {
+    let emailAtualizado = uniqueEmail; // Rastrear o email atual
+
+    it('deve retornar erro 401 sem autenticação', () => {
+      return request(app.getHttpServer())
+        .put(`/users/${createdUserId}`)
+        .send({ name: 'João Atualizado' })
+        .expect(401);
+    });
+
+    it('deve atualizar nome do usuário', () => {
+      return request(app.getHttpServer())
+        .put(`/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ name: 'João Silva Atualizado' })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('name', 'João Silva Atualizado');
+          expect(res.body).toHaveProperty('email', emailAtualizado);
+        });
+    });
+
+    it('deve atualizar email do usuário', () => {
+      emailAtualizado = `joao-novo-${Date.now()}@example.com`;
+      return request(app.getHttpServer())
+        .put(`/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ email: emailAtualizado })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('email', emailAtualizado);
+        });
+    });
+
+    it('deve retornar erro 400 com email inválido', () => {
+      return request(app.getHttpServer())
+        .put(`/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ email: 'email-invalido' })
+        .expect(400);
+    });
+
+    it('deve retornar erro 409 se novo email já existe', () => {
+      // Primeiro criar outro usuário
+      const anotherEmail = `otro-${Date.now()}@example.com`;
+      return request(app.getHttpServer())
+        .post('/users')
+        .send({
+          name: 'Outro Usuario',
+          email: anotherEmail,
+          password: 'senha123',
+        })
+        .then(() => {
+          // Tentar atualizar primeiro usuário com email do segundo
+          return request(app.getHttpServer())
+            .put(`/users/${createdUserId}`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({ email: anotherEmail })
+            .expect(409);
+        });
+    });
+
+    it('deve retornar erro 404 para ID inválido', () => {
+      return request(app.getHttpServer())
+        .put('/users/00000000-0000-0000-0000-000000000000')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ name: 'Novo Nome' })
+        .expect(404);
+    });
+
+    it('deve atualizar a senha do usuário', () => {
+      return request(app.getHttpServer())
+        .put(`/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ password: 'novasenha123' })
+        .expect(200)
+        .then(() => {
+          // Tentar fazer login com a nova senha
+          return request(app.getHttpServer())
+            .post('/auth/login')
+            .send({
+              email: emailAtualizado,
+              password: 'novasenha123',
+            })
+            .expect(200);
+        });
+    });
+  });
+
+  describe('DELETE /users/:id - Deletar usuário', () => {
+    let userToDelete: string;
+    let userEmailToDelete: string;
+
+    beforeAll(async () => {
+      // Criar um usuário para ser deletado
+      userEmailToDelete = `delete-${Date.now()}@example.com`;
+      const res = await request(app.getHttpServer())
+        .post('/users')
+        .send({
+          name: 'Usuario Para Deletar',
+          email: userEmailToDelete,
+          password: 'senha123',
+        });
+      userToDelete = res.body.id;
+    });
+
+    it('deve retornar erro 401 sem autenticação', () => {
+      return request(app.getHttpServer())
+        .delete(`/users/${userToDelete}`)
+        .expect(401);
+    });
+
+    it('deve deletar usuário com sucesso', () => {
+      // Obter um token válido para fazer o delete
+      return request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: userEmailToDelete,
+          password: 'senha123',
+        })
+        .then((res) => {
+          const deleteToken = res.body.accessToken;
+          return request(app.getHttpServer())
+            .delete(`/users/${userToDelete}`)
+            .set('Authorization', `Bearer ${deleteToken}`)
+            .expect(204);
+        });
+    });
+
+    it('deve retornar erro 404 para ID inválido', () => {
+      return request(app.getHttpServer())
+        .delete('/users/00000000-0000-0000-0000-000000000000')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(404);
+    });
+
+    it('não deve encontrar usuário após deletar', () => {
+      return request(app.getHttpServer())
+        .get(`/users/${userToDelete}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(404);
     });
   });
 });
