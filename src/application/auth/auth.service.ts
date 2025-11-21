@@ -14,9 +14,12 @@ export class AuthServiceImplemantation  {
 
 
     async login(login: LogindDto): Promise<LoginResponse> {
-        const user = await this.userRepository.findOne({where : { email: login.email }});
+        const user = await this.userRepository.findOne({
+            where : { email: login.email },
+            select: ['id', 'name', 'email', 'password', 'createdAt', 'updatedAt']
+        });
 
-        if (!user) {
+        if (!user || !user.password) {
             throw new UnauthorizedException('O email ou senha estão incorretos');
         }
 
