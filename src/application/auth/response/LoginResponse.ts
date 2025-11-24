@@ -1,3 +1,11 @@
+export interface UserResponse {
+  id: string;
+  name: string;
+  email: string;
+  role?: string;
+}
+
 export interface LoginResponse {
-  accessToken: string;
+  access_token: string;
+  user: UserResponse;
 }
