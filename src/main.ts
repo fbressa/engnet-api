@@ -33,8 +33,9 @@ async function bootstrap() {
   // SWAGGER
   setupSwagger(app);
 
-  await app.listen(3000);
-  logger.log('API iniciada na porta 3000', 'Bootstrap');
-  logger.log('Swagger disponível em http://localhost:3000/api/docs', 'Bootstrap');
+  const port = parseInt(process.env.API_PORT ?? '3000', 10);
+  await app.listen(port);
+  logger.log(`API iniciada na porta ${port}`, 'Bootstrap');
+  logger.log(`Swagger disponível em http://localhost:${port}/api/docs`, 'Bootstrap');
 }
 bootstrap();
