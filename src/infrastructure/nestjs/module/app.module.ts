@@ -12,6 +12,7 @@ import { RefundModule } from '../../../service/refund/refund.module';
 import { ClientModule } from '../../../service/client/client.module';
 import { UserModule } from '../../../service/user/user.module';
 import { DashboardModule } from '../../../service/dashboard/dashboard.module';
+import { ReportModule } from '../../../service/report/report.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DashboardModule } from '../../../service/dashboard/dashboard.module';
     ClientModule,
     UserModule,
     DashboardModule,
+    ReportModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig],
