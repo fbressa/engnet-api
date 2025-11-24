@@ -15,6 +15,9 @@ export class UserEntity {
 
   @Column({ select: false })
   password: string;
+  
+  @Column({ default: 'user' })
+  role: string;
 
   // Adicione isso:
   @OneToMany(() => RefundEntity, (refund) => refund.user)

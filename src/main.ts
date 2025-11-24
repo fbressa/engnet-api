@@ -22,6 +22,32 @@ async function bootstrap() {
     }),
   );
 
+  // CORS - suporta múltiplas origens via variável de ambiente CORS_ORIGIN (vírgula-separadas)
+  const corsOriginEnv = process.env.CORS_ORIGIN ?? '*';
+  const allowedOrigins = String(corsOriginEnv)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (like curl, server-to-server)
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   // TRATAMENTO DE ERROS GLOBAL
   app.useGlobalFilters(new HttpExceptionFilter(logger));
 
@@ -33,7 +59,7 @@ async function bootstrap() {
   // SWAGGER
   setupSwagger(app);
 
-  const port = parseInt(process.env.API_PORT ?? '3000', 10);
+  const port = parseInt(process.env.API_PORT ?? '4000', 10);
   await app.listen(port);
   logger.log(`API iniciada na porta ${port}`, 'Bootstrap');
   logger.log(`Swagger disponível em http://localhost:${port}/api/docs`, 'Bootstrap');
