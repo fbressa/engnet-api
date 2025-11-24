@@ -11,6 +11,7 @@ import { RefundEntity } from '../../../entity/refund/refund.entity';
 import { RefundModule } from '../../../service/refund/refund.module';
 import { ClientModule } from '../../../service/client/client.module';
 import { UserModule } from '../../../service/user/user.module';
+import { DashboardModule } from '../../../service/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from '../../../service/user/user.module';
     RefundModule,
     ClientModule,
     UserModule,
+    DashboardModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig],
