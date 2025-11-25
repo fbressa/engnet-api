@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { IsString, IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, Length, ValidateIf } from 'class-validator';
 
 export class CreateClientDto {
   @IsString()
@@ -10,8 +10,9 @@ export class CreateClientDto {
   @IsNotEmpty({ message: 'O nome do responsável é obrigatório' })
   contactPerson: string;
 
+  @IsOptional()
+  @ValidateIf((o) => o.cnpj && o.cnpj.length > 0) // Só valida se não estiver vazio
   @IsString()
-  @IsOptional() // CNPJ é opcional
-  @Length(14, 18) // Aceita formato 00.000.000/0000-00 ou apenas números
+  @Length(14, 18, { message: 'CNPJ deve ter entre 14 e 18 caracteres' })
   cnpj?: string;
 }

@@ -5,7 +5,7 @@ import { RefundEntity } from '../../entity/refund/refund.entity';
 import { UserEntity } from '../../entity/user/user.entity';
 import { ClientEntity } from '../../entity/client/client.entity';
 import { DashboardService } from './dashboard.service';
-import { DashboardController } from './dashboard.controller';
+import { DashboardController } from '../../controllers/dashboard.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([RefundEntity, UserEntity, ClientEntity])],

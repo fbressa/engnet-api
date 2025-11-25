@@ -13,12 +13,21 @@ async function bootstrap() {
     logger: logger,
   });
 
-  // VALIDAÇÃO GLOBAL
+  // Garantir que está usando body parser para JSON
+  app.use(require('express').json({ limit: '10mb' }));
+  app.use(require('express').urlencoded({ extended: true, limit: '10mb' }));
+
+  // VALIDAÇÃO GLOBAL - Temporariamente com validação mais permissiva para debug
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      whitelist: false, // Permitir campos extras temporariamente
+      forbidNonWhitelisted: false,
       transform: true,
+      transformOptions: {
+        enableImplicitConversion: true, // Converte strings para números automaticamente
+      },
+      skipMissingProperties: false,
+      disableErrorMessages: false,
     }),
   );
 
