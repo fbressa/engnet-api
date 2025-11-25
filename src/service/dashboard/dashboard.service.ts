@@ -79,12 +79,20 @@ export class DashboardService {
   private async getClientStats(): Promise<ClientStatsDto> {
     const totalClients = await this.clientRepository.count();
     
+    // Contar clientes com CNPJ (contratos fechados)
+    const closedContracts = await this.clientRepository
+      .createQueryBuilder('client')
+      .where('client.cnpj IS NOT NULL')
+      .andWhere("client.cnpj != ''")
+      .getCount();
+    
     // Para agora, consideramos todos como sem reembolsos diretos
     // Pois a relação de Client -> Refund não está implementada na entidade
     return {
       totalClients,
       totalWithRefunds: 0,
       totalWithoutRefunds: totalClients,
+      closedContracts,
     };
   }
 
