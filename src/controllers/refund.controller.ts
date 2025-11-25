@@ -31,6 +31,15 @@ export class RefundController {
     description: 'Dados inválidos'
   })
   async create(@Body() createRefundDto: CreateRefundDto): Promise<RefundResponseDto> {
+    console.log('=== RECEIVED REFUND DATA ===');
+    console.log('Raw body:', createRefundDto);
+    console.log('Types:', {
+      description: typeof createRefundDto.description,
+      amount: typeof createRefundDto.amount,
+      userId: typeof createRefundDto.userId
+    });
+    console.log('===========================');
+    
     const refund = await this.refundService.create(createRefundDto);
     return this.mapToResponseDto(refund);
   }

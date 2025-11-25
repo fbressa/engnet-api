@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import databaseConfig from "../config/database.config";
@@ -13,6 +13,7 @@ import { ClientModule } from '../../../service/client/client.module';
 import { UserModule } from '../../../service/user/user.module';
 import { DashboardModule } from '../../../service/dashboard/dashboard.module';
 import { ReportModule } from '../../../service/report/report.module';
+import { BodyLoggerMiddleware } from '../middlewares/body-logger.middleware';
 
 @Module({
   imports: [
@@ -46,4 +47,10 @@ import { ReportModule } from '../../../service/report/report.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(BodyLoggerMiddleware)
+      .forRoutes('*');
+  }
+}
